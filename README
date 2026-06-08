@@ -1,0 +1,61 @@
+# AD — Quebrador de CAPTCHA de Voz
+
+Ferramenta que transcreve áudios de CAPTCHA de voz, corrige o texto extraído e renomeia as imagens correspondentes automaticamente.
+
+## Como funciona
+
+1. Lê os arquivos de áudio da pasta `Audio/`
+2. Transcreve cada áudio usando o script `trascrever.py`
+3. Corrige e valida o texto transcrito via `ManagerValidateTypesWords.py`
+4. Renomeia as imagens em `Images/` com o texto extraído
+5. Exporta todas as transcrições para a pasta `Transcript/`
+
+## Estrutura de pastas
+
+```
+AD/
+├── Audio/          # Arquivos de áudio dos CAPTCHAs
+├── Images/         # Imagens dos CAPTCHAs (serão renomeadas)
+├── Transcript/     # Transcrições exportadas em .txt
+├── IA/             # Recursos de inteligência artificial
+├── quebrarCaptchaVoz.py
+├── trascrever.py
+├── ManagerValidateTypesWords.py
+├── deleteFull.py
+└── getImg.py
+```
+
+## Requisitos
+
+- Python 3.8+
+- Dependências (instale com pip):
+
+```bash
+pip install -r requirements.txt
+```
+
+> **Nota:** Certifique-se de ter as dependências do `trascrever.py` instaladas (ex: `openai-whisper` ou similar).
+
+## Configuração
+
+Antes de rodar, defina os caminhos das pastas no início de `quebrarCaptchaVoz.py`:
+
+```python
+BASE_DIR = "caminho/para/o/projeto"
+DIR_IMAGES = os.path.join(BASE_DIR, "Images")
+DIR_AUDIO  = os.path.join(BASE_DIR, "Audio")
+DIR_TRANSCRIPT = os.path.join(BASE_DIR, "Transcript")
+```
+
+## Como usar
+
+```bash
+python quebrarCaptchaVoz.py
+```
+
+As imagens em `Images/` serão renomeadas com o texto do CAPTCHA correspondente, e um arquivo `.txt` com todas as transcrições será salvo em `Transcript/`.
+
+## Observações
+
+- O modelo `modelo_captcha.h5` não está incluído no repositório. Treine o seu próprio ou obtenha-o separadamente.
+- As pastas `Audio/`, `Images/` e `Transcript/` também não são versionadas — crie-as localmente antes de rodar.

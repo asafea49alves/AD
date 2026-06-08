@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Ambientes virtuais
+venv/
+env/
+.env/
+.venv/
+
+# Modelos de ML (use Git LFS se precisar versionar)
+*.h5
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.pb
+
+# Dados gerados pelo projeto
+Audio/
+Images/
+Transcript/
+IA/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
