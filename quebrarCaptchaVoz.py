@@ -2,6 +2,7 @@ import os
 import subprocess
 dirImages = os.listdir('C://Users/asafe/Downloads/AD/Images/')
 dirAudio = os.listdir('C://Users/asafe/Downloads/AD/Audio/')
+dirBase = 'C://Users/asafe/Downloads/'
 list = []
 index = 0
 
@@ -17,7 +18,7 @@ def TranscriptList():
     
     while index < len(dirAudio):
 
-        result = subprocess.run([f"python3", "trascrever.py", f"C://Users/asafe/Downloads/AD/Audio/{dirAudio[index]}", "-v", "0.9"], capture_output=True, text=True)
+        result = subprocess.run([f"python3", "trascrever.py", f"{dirBase}/AD/Audio/{dirAudio[index]}", "-v", "0.9"], capture_output=True, text=True)
         print(f"Resultado do comando: {result.stdout}")
 
         for linha in result.stdout.splitlines():
@@ -31,10 +32,6 @@ def TranscriptList():
 
                 separed = transcricao.replace(" ", ",").replace(".", "")
                 listCaracters = separed.split(",")
-
-                # for i in range(len(listCaracters)):
-                #     if listCaracters[i].lower().__contains__("ps") or listCaracters[i].lower().__contains__("psu") or listCaracters[i].lower().__contains__("ips") or listCaracters[i].lower().__contains__("ipsu"):
-                #         listCaracters[i] = "y"
                         
                 print(f"Lista de caracteres após validação: {listCaracters}")
                 texto = "".join(listCaracters)
@@ -46,12 +43,12 @@ def TranscriptList():
 def RenomearArchivePhoto(list):
 
     for i in range(len(list)):
-        os.rename(f"C://Users/asafe/Downloads/AD/Images/{dirImages[i]}", f"C://Users/asafe/Downloads/AD/Images/{list[i]}.png")
+        os.rename(f"{dirBase}/AD/Images/{dirImages[i]}", f"{dirBase}/AD/Images/{list[i]}.png")
 
     
 
 def ExportarTranscricao():
-    with open(f"C://Users/asafe/Downloads/AD/Transcript/transcricoes{index}.txt", "w", encoding="utf-8") as f:
+    with open(f"{dirBase}/AD/Transcript/transcricoes{index}.txt", "w", encoding="utf-8") as f:
         for item in list:
             f.write(item + "\n")
 
