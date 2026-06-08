@@ -1,6 +1,5 @@
 import os
 import subprocess
-
 dirImages = os.listdir('C://Users/asafe/Downloads/AD/Images/')
 dirAudio = os.listdir('C://Users/asafe/Downloads/AD/Audio/')
 list = []
@@ -11,19 +10,6 @@ def main():
     if list.__len__() > 0:
         RenomearArchivePhoto(list)
         ExportarTranscricao()
-
-def ValidIfContaisTextOfNumber(frase):
-
-    listaNumerosditada = ["um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "zero"]
-    listaNumerosNumeral = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-
-    if frase in listaNumerosditada:
-        indice = listaNumerosditada.index(frase)
-        return str(listaNumerosNumeral[indice])
-
-    print("Validando padrões de letras e frases...")
-    
-    print("Validação concluída.")
     
 
 def TranscriptList():
@@ -38,14 +24,17 @@ def TranscriptList():
 
             if "TRANSCRIÇÃO:" in linha:
                 transcricao = linha.split("TRANSCRIÇÃO:")[1].strip()
-                texto = ValidIfContaisTextOfNumber(transcricao)
+
+                import ManagerValidateTypesWords as mv
+                texto = mv.corrigir_audio_captcha_avancado(transcricao)
+                print(f"Texto após correção avançada: {texto}")
 
                 separed = transcricao.replace(" ", ",").replace(".", "")
                 listCaracters = separed.split(",")
 
-                for i in range(len(listCaracters)):
-                    if listCaracters[i].lower().__contains__("ps") or listCaracters[i].lower().__contains__("psu") or listCaracters[i].lower().__contains__("ips") or listCaracters[i].lower().__contains__("ipsu"):
-                        listCaracters[i] = "y"
+                # for i in range(len(listCaracters)):
+                #     if listCaracters[i].lower().__contains__("ps") or listCaracters[i].lower().__contains__("psu") or listCaracters[i].lower().__contains__("ips") or listCaracters[i].lower().__contains__("ipsu"):
+                #         listCaracters[i] = "y"
                         
                 print(f"Lista de caracteres após validação: {listCaracters}")
                 texto = "".join(listCaracters)
