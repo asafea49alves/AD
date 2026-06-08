@@ -1,61 +1,106 @@
 # AD — Quebrador de CAPTCHA de Voz
 
-Ferramenta que transcreve áudios de CAPTCHA de voz, corrige o texto extraído e renomeia as imagens correspondentes automaticamente.
+Ferramenta em Python que transcreve áudios de CAPTCHA de voz usando o **Whisper** (OpenAI), corrige o texto extraído automaticamente e renomeia as imagens correspondentes com o resultado.
+
+---
 
 ## Como funciona
 
-1. Lê os arquivos de áudio da pasta `Audio/`
-2. Transcreve cada áudio usando o script `trascrever.py`
-3. Corrige e valida o texto transcrito via `ManagerValidateTypesWords.py`
-4. Renomeia as imagens em `Images/` com o texto extraído
-5. Exporta todas as transcrições para a pasta `Transcript/`
+1. Lê os arquivos de áudio da pasta `Audio/` e as imagens da pasta `Images/`
+2. Para cada áudio, chama `trascrever.py` via subprocess passando o caminho do arquivo e a velocidade desejada
+3. O `trascrever.py` usa o modelo Whisper localmente para transcrever o áudio (com suporte a alterar a velocidade via FFmpeg antes de processar)
+4. O texto transcrito é corrigido por `ManagerValidateTypesWords.py`, que aplica regras para tratar erros comuns de transcrição em CAPTCHAs
+5. As imagens em `Images/` são renomeadas com o texto extraído (ex: `abc123.png`)
+6. Todas as transcrições são exportadas em um arquivo `.txt` na pasta `Transcript/`
+
+---
 
 ## Estrutura de pastas
 
 ```
 AD/
-├── Audio/          # Arquivos de áudio dos CAPTCHAs
-├── Images/         # Imagens dos CAPTCHAs (serão renomeadas)
-├── Transcript/     # Transcrições exportadas em .txt
-├── IA/             # Recursos de inteligência artificial
-├── quebrarCaptchaVoz.py
-├── trascrever.py
-├── ManagerValidateTypesWords.py
-├── deleteFull.py
-└── getImg.py
+├── Audio/                          # Arquivos de áudio dos CAPTCHAs (.ashx, .wav, .mp3...)
+├── Images/                         # Imagens dos CAPTCHAs (serão renomeadas)
+├── Transcript/                     # Arquivos .txt com as transcrições exportadas
+├── IA/                             # Recursos de IA do projeto
+├── quebrarCaptchaVoz.py            # Script principal — orquestra todo o fluxo
+├── trascrever.py                   # Transcreve um áudio usando Whisper (uso standalone ou via subprocess)
+├── ManagerValidateTypesWords.py    # Corrige e valida o texto transcrito
+├── getImg.py                       # Utilitário para obter imagens
+├── deleteFull.py                   # Utilitário para limpeza de arquivos
+└── modelo_captcha.h5               # Modelo de ML treinado para CAPTCHAs
 ```
+
+---
 
 ## Requisitos
 
 - Python 3.8+
-- Dependências (instale com pip):
+- [FFmpeg](https://ffmpeg.org/download.html) instalado e no PATH do sistema (necessário para alterar velocidade do áudio)
+- Dependências Python instaladas automaticamente pelo `trascrever.py` na primeira execução:
 
-```bash
-pip install -r requirements.txt
+```
+openai-whisper
 ```
 
-> **Nota:** Certifique-se de ter as dependências do `trascrever.py` instaladas (ex: `openai-whisper` ou similar).
-
-## Configuração
-
-Antes de rodar, defina os caminhos das pastas no início de `quebrarCaptchaVoz.py`:
-
-```python
-BASE_DIR = "caminho/para/o/projeto"
-DIR_IMAGES = os.path.join(BASE_DIR, "Images")
-DIR_AUDIO  = os.path.join(BASE_DIR, "Audio")
-DIR_TRANSCRIPT = os.path.join(BASE_DIR, "Transcript")
-```
+---
 
 ## Como usar
+
+### 1. Configure os caminhos
+
+No arquivo `quebrarCaptchaVoz.py`, ajuste os caminhos para a sua máquina:
+
+```python
+dirImages = os.listdir('C://Users/SEU_USUARIO/Downloads/AD/Images/')
+dirAudio  = os.listdir('C://Users/SEU_USUARIO/Downloads/AD/Audio/')
+```
+
+### 2. Coloque os arquivos nas pastas
+
+- Áudios dos CAPTCHAs → pasta `Audio/`
+- Imagens correspondentes → pasta `Images/` (na mesma ordem dos áudios)
+
+### 3. Execute o script principal
 
 ```bash
 python quebrarCaptchaVoz.py
 ```
 
-As imagens em `Images/` serão renomeadas com o texto do CAPTCHA correspondente, e um arquivo `.txt` com todas as transcrições será salvo em `Transcript/`.
+As imagens serão renomeadas e um arquivo `transcricoesN.txt` será gerado em `Transcript/`.
+
+---
+
+## Uso do trascrever.py de forma independente
+
+O `trascrever.py` também pode ser usado sozinho para transcrever qualquer áudio:
+
+```bash
+# Uso básico
+python trascrever.py Audio/captcha.wav
+
+# Com velocidade reduzida (útil para CAPTCHAs com fala rápida)
+python trascrever.py Audio/captcha.wav -v 0.75
+
+# Especificando modelo e idioma
+python trascrever.py Audio/captcha.wav -m small -i pt -v 0.75
+```
+
+### Modelos disponíveis
+
+| Modelo   | Velocidade       | Precisão          |
+|----------|------------------|-------------------|
+| `tiny`   | Muito rápido     | Menor             |
+| `base`   | Rápido           | Boa (padrão)      |
+| `small`  | Equilibrado      | Média             |
+| `medium` | Lento            | Alta              |
+| `large`  | Muito lento      | Máxima            |
+
+---
 
 ## Observações
 
-- O modelo `modelo_captcha.h5` não está incluído no repositório. Treine o seu próprio ou obtenha-o separadamente.
-- As pastas `Audio/`, `Images/` e `Transcript/` também não são versionadas — crie-as localmente antes de rodar.
+- O Whisper roda **100% localmente**, sem precisar de API ou internet após o download do modelo.
+- O modelo é baixado automaticamente na primeira execução do `trascrever.py`.
+- O `modelo_captcha.h5` é um modelo Keras treinado para reconhecimento de CAPTCHAs visuais.
+- Os arquivos de áudio no formato `.ashx` (comuns em CAPTCHAs de sites) são suportados.
